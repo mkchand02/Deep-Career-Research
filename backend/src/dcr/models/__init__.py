@@ -1,6 +1,7 @@
 """Domain models."""
 
 from dcr.models.profile import (
+    DEGREE_RANK,
     AnalysisRecord,
     DegreeLevel,
     Education,
@@ -27,6 +28,7 @@ from dcr.models.results import (
 )
 
 __all__ = [
+    "DEGREE_RANK",
     "AnalysisRecord",
     "Bucket",
     "CheckResult",

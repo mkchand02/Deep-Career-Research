@@ -139,6 +139,7 @@ class NormalizedProfile(BaseModel):
     current_title: str | None = None
     canonical_role: str | None = None
     level: LevelBand = LevelBand.UNKNOWN
+    level_inferred: bool = False
     role_confidence: float = 0.0
     company_confidence: float = 0.0
     country: str | None = None
