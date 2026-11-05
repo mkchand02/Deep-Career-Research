@@ -92,6 +92,7 @@ export type RunSummary = {
     company: string;
     country: string;
     joined_within_days: number | null;
+    reference_date: string | null;
     exp: [number, number | null];
     roles: string[];
     sources: string[];

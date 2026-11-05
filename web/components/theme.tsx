@@ -28,7 +28,7 @@ export function ThemeToggle() {
   };
   return (
     <button onClick={toggle} className="text-xs text-ink2 hover:text-ink" aria-label="Toggle theme">
-      {theme === "dark" ? "Light" : "Dark"} mode
+      Theme: {theme ?? "auto"}
     </button>
   );
 }

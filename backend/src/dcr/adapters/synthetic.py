@@ -23,16 +23,17 @@ def synthetic_dataset(n: int, seed: int, ref: date, company: str) -> SyntheticDa
 
 @register_adapter
 class SyntheticAdapter(SourceAdapter):
-    """Fake people. params: ``n`` (default 1000), ``seed`` (default 42)."""
+    """Fake people. params: ``n`` (default 1000), ``seed`` (default 42), ``vary_by_date`` (new snapshot per date)."""
 
     name: ClassVar[str] = "synthetic"
     description: ClassVar[str] = "Generated fake profiles for development (no real people)"
     tos_note: ClassVar[str] = "Synthetic data, no restrictions."
 
     def _data(self, query: StudyQuery) -> SyntheticDataset:
-        return synthetic_dataset(
-            int(self.params.get("n", 1000)), int(self.params.get("seed", 42)), query.ref_date(), query.company
-        )
+        seed = int(self.params.get("seed", 42))
+        if str(self.params.get("vary_by_date", "")).lower() in ("1", "true", "yes"):
+            seed += query.ref_date().toordinal()  # simulate a fresh snapshot on each re-run date
+        return synthetic_dataset(int(self.params.get("n", 1000)), seed, query.ref_date(), query.company)
 
     async def search(self, query: StudyQuery, limit: int) -> list[Candidate]:
         self._ds = self._data(query)

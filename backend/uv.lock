@@ -620,6 +620,7 @@ dev = [
     { name = "ruff" },
     { name = "types-python-dateutil" },
     { name = "types-pyyaml" },
+    { name = "weasyprint" },
 ]
 
 [package.metadata]
@@ -662,6 +663,7 @@ dev = [
     { name = "ruff", specifier = ">=0.6" },
     { name = "types-python-dateutil" },
     { name = "types-pyyaml" },
+    { name = "weasyprint", specifier = ">=62" },
 ]
 
 [[package]]

@@ -7,6 +7,7 @@ endpoint (``privacy.audit_mode``) returns anonymized IDs and filter reasons, not
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
@@ -14,7 +15,7 @@ from typing import Any
 
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import HTMLResponse, Response, StreamingResponse
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -70,6 +71,7 @@ def _run_public(run: Run) -> dict[str, Any]:
         "joined_within_days": q.get("joined_within_days"),
         "joined_from": q.get("joined_from"),
         "joined_to": q.get("joined_to"),
+        "reference_date": q.get("reference_date") or (run.created_at.date().isoformat() if run.created_at else None),
         "exp": [q.get("exp_min"), q.get("exp_max")],
         "roles": q.get("roles"),
         "sources": [s.get("name") for s in q.get("sources", [])],
@@ -88,12 +90,24 @@ def create_app(
     sm = session_factory or get_sessionmaker()
     queue = LocalTaskQueue(sm, cfg, sec)
 
+    async def purge_loop() -> None:
+        from dcr.pipeline.retention import purge_expired
+
+        while True:
+            with contextlib.suppress(Exception):  # never let retention crash the server
+                await asyncio.to_thread(purge_expired, sm, cfg)
+            await asyncio.sleep(3600)
+
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+        purger = None
         if start_queue:
             await queue.start()
+            purger = asyncio.create_task(purge_loop())
         yield
         if start_queue:
+            if purger:
+                purger.cancel()
             await queue.stop()
 
     app = FastAPI(
@@ -329,6 +343,74 @@ def create_app(
             return get_report(sm, run_id, filters, cfg)
         except LookupError as exc:
             raise HTTPException(404, str(exc)) from exc
+
+    @app.get("/api/runs/{run_id}/export.{fmt}")
+    def export(run_id: int, fmt: str, request: Request) -> Response:
+        from dcr.exports.report import ExportPrivacyError, charts_zip, to_csv, to_html, to_json, to_pdf
+        from dcr.timeutil import utcnow
+
+        filters = {k: v for k, v in request.query_params.items() if k in DIMENSIONS and v}
+        try:
+            rep = get_report(sm, run_id, filters, cfg)
+        except LookupError as exc:
+            raise HTTPException(404, str(exc)) from exc
+        k = cfg.privacy.k_anonymity
+        stamp = utcnow().strftime("%Y-%m-%d %H:%M UTC")
+        name = f"dcr-run{run_id}" + ("-" + "-".join(f"{a}_{b}" for a, b in sorted(filters.items())) if filters else "")
+        try:
+            if fmt == "csv":
+                return Response(
+                    to_csv(rep, k),
+                    media_type="text/csv",
+                    headers={"Content-Disposition": f'attachment; filename="{name}.csv"'},
+                )
+            if fmt == "json":
+                return Response(
+                    to_json(rep, k),
+                    media_type="application/json",
+                    headers={"Content-Disposition": f'attachment; filename="{name}.json"'},
+                )
+            if fmt == "html":
+                return HTMLResponse(to_html(rep, k, stamp))
+            if fmt == "pdf":
+                return Response(
+                    to_pdf(rep, k, stamp),
+                    media_type="application/pdf",
+                    headers={"Content-Disposition": f'attachment; filename="{name}.pdf"'},
+                )
+            if fmt == "zip":
+                return Response(
+                    charts_zip(rep, k),
+                    media_type="application/zip",
+                    headers={"Content-Disposition": f'attachment; filename="{name}-charts.zip"'},
+                )
+        except ExportPrivacyError as exc:
+            raise HTTPException(500, str(exc)) from exc
+        except RuntimeError as exc:
+            raise HTTPException(501, str(exc)) from exc
+        raise HTTPException(400, "format must be csv, json, html, pdf or zip")
+
+    @app.get("/api/compare")
+    def compare(request: Request, runs: str = Query(..., description="comma-separated run ids")) -> dict[str, Any]:
+        from dcr.analytics.compare import compare_runs
+
+        filters = {k: v for k, v in request.query_params.items() if k in DIMENSIONS and v}
+        try:
+            ids = [int(x) for x in runs.split(",") if x.strip()]
+            return compare_runs(sm, ids, filters, cfg)
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from exc
+        except LookupError as exc:
+            raise HTTPException(404, str(exc)) from exc
+
+    @app.post("/api/purge")
+    def purge(dry_run: bool = False) -> dict[str, Any]:
+        from dcr.pipeline.retention import purge_expired
+
+        return {
+            "dry_run": dry_run,
+            "deleted" if not dry_run else "would_delete": purge_expired(sm, cfg, dry_run=dry_run),
+        }
 
     @app.get("/api/runs/{run_id}/audit")
     def run_audit(run_id: int, limit: int = Query(200, le=2000), s: Session = Depends(db)) -> dict[str, Any]:

@@ -142,8 +142,9 @@ class WebScraperAdapter(SourceAdapter):
             company = works.get("name") if isinstance(works, dict) else (works if isinstance(works, str) else None)
             alumni = p.get("alumniOf")
             alumni_list = alumni if isinstance(alumni, list) else [alumni] if alumni else []
-            edu = [Education(institution=str(a.get("name") or "") if isinstance(a, dict) else str(a))
-                   for a in alumni_list]
+            edu = [
+                Education(institution=str(a.get("name") or "") if isinstance(a, dict) else str(a)) for a in alumni_list
+            ]
             edu = [e for e in edu if e.institution]
             addr = p.get("address") or p.get("homeLocation")
             location = (addr.get("addressLocality") or addr.get("name")) if isinstance(addr, dict) else addr

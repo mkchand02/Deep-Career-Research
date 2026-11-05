@@ -97,6 +97,7 @@ export default function Dashboard({ params }: { params: Promise<{ id: string }> 
           <a className="btn-ghost" href={`/api/runs/${id}/export.json`}>JSON</a>
           <a className="btn-ghost" href={`/api/runs/${id}/export.html`} target="_blank">HTML report</a>
           <a className="btn-ghost" href={`/api/runs/${id}/export.pdf`}>PDF</a>
+          <a className="btn-ghost" href={`/api/runs/${id}/export.zip`}>Charts (PNG)</a>
           <Link className="btn-ghost" href={`/compare?runs=${id}`}>Compare…</Link>
         </div>
       </div>

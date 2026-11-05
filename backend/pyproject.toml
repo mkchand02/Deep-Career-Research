@@ -49,6 +49,7 @@ dev = [
   "mypy>=1.11",
   "types-pyyaml",
   "types-python-dateutil",
+  "weasyprint>=62",
 ]
 
 [build-system]
@@ -75,6 +76,7 @@ ignore = ["RUF001", "RUF002", "RUF003", "B008", "RUF012", "UP047", "SIM108"]
 
 [tool.ruff.lint.per-file-ignores]
 "src/dcr/synth/generator.py" = ["E501"]
+"src/dcr/exports/report.py" = ["E501"]
 
 [tool.mypy]
 python_version = "3.12"

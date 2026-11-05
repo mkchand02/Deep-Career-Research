@@ -198,6 +198,131 @@ def run(
     asyncio.run(run_study_cli(q, console=console, assume_yes=yes, save_as=save_as, out=out))
 
 
+study_app = typer.Typer(help="Saved studies.")
+app.add_typer(study_app, name="study")
+
+
+@study_app.command("list")
+def study_list() -> None:
+    """List saved studies and their runs."""
+    from dcr.db.models import Run, Study
+    from dcr.db.session import get_sessionmaker
+
+    t = Table("id", "name", "company", "window", "exp", "runs (id:n)")
+    with get_sessionmaker()() as s:
+        for st in s.query(Study).order_by(Study.id).all():
+            q = st.query_json
+            runs = s.query(Run).filter_by(study_id=st.id).order_by(Run.id).all()
+            t.add_row(
+                str(st.id),
+                st.name,
+                f"{q['company']} ({q['country']})",
+                f"{q.get('joined_within_days')}d",
+                f"{q['exp_min']}-{q.get('exp_max')}",
+                ", ".join(f"{r.id}:{(r.stage_counts or {}).get('sampled', '-')}" for r in runs),
+            )
+    console.print(t)
+
+
+@study_app.command("rerun")
+def study_rerun(
+    name: Annotated[str, typer.Argument(help="Study name")],
+    yes: Annotated[bool, typer.Option("--yes", "-y")] = False,
+    ref_date: Annotated[str | None, typer.Option(help="Reference 'today' (YYYY-MM-DD)")] = None,
+) -> None:
+    """Re-run a saved study with today's (or the given) reference date."""
+    from dcr.db.models import Study
+    from dcr.db.session import get_sessionmaker
+    from dcr.pipeline.runner import run_study_cli
+
+    with get_sessionmaker()() as s:
+        st = s.query(Study).filter_by(name=name).one_or_none()
+        if st is None:
+            console.print(f"[red]No study named {name}[/red]")
+            raise typer.Exit(1)
+        q = StudyQuery.model_validate(st.query_json)
+    q = q.model_copy(update={"reference_date": date.fromisoformat(ref_date) if ref_date else None})
+    asyncio.run(run_study_cli(q, console=console, assume_yes=yes, save_as=name))
+
+
+@app.command()
+def compare(run_ids: Annotated[list[int], typer.Argument(help="2-3 run ids")]) -> None:
+    """Compare runs (re-runs of a study, or different studies) using stored aggregates."""
+    from dcr.analytics.compare import compare_runs
+    from dcr.db.session import get_sessionmaker
+
+    out = compare_runs(get_sessionmaker(), run_ids, {}, get_config())
+    t = Table("run", "n", "window", "per 30 days", title="Volume")
+    for h in out["headline"]:
+        t.add_row(str(h["run_id"]), str(h["n"]), str(h["window_days"]), str(h["per_30_days"]))
+    console.print(t)
+    for m in out["metrics"]:
+        if not m["deltas"]:
+            continue
+        t = Table("bucket", "from %", "to %", "Δ pp", "p", title=m["label"])
+        for d in m["deltas"][:8]:
+            t.add_row(
+                str(d["key"]),
+                str(d["from_pct"]),
+                str(d["to_pct"]),
+                f"{d['delta_pp']:+}",
+                f"{d['p_value']}{' *' if d['significant'] else ''}",
+            )
+        console.print(t)
+    console.print(f"[dim]{out['note']}[/dim]")
+
+
+@app.command()
+def export(
+    run_id: Annotated[int, typer.Argument(help="Run id")],
+    fmt: Annotated[str, typer.Option("--format", "-f", help="csv|json|html|pdf|zip")] = "html",
+    out: Annotated[Path | None, typer.Option(help="Output file")] = None,
+    filter_: Annotated[list[str] | None, typer.Option("--filter", help="dim=value (repeatable)")] = None,
+) -> None:
+    """Export an aggregate report (never per-person data)."""
+    from dcr.analytics.store import get_report
+    from dcr.db.session import get_sessionmaker
+    from dcr.exports.report import charts_zip, to_csv, to_html, to_json, to_pdf
+    from dcr.timeutil import utcnow
+
+    filters = dict(f.split("=", 1) for f in (filter_ or []))
+    cfg = get_config()
+    rep = get_report(get_sessionmaker(), run_id, filters, cfg)
+    k = cfg.privacy.k_anonymity
+    stamp = utcnow().strftime("%Y-%m-%d %H:%M UTC")
+    out = out or Path(f"exports/dcr-run{run_id}.{fmt}")
+    out.parent.mkdir(parents=True, exist_ok=True)
+    if fmt == "csv":
+        out.write_text(to_csv(rep, k))
+    elif fmt == "json":
+        out.write_text(to_json(rep, k))
+    elif fmt == "html":
+        out.write_text(to_html(rep, k, stamp))
+    elif fmt == "pdf":
+        out.write_bytes(to_pdf(rep, k, stamp))
+    elif fmt == "zip":
+        out.write_bytes(charts_zip(rep, k))
+    else:
+        raise typer.BadParameter("format must be csv, json, html, pdf or zip")
+    console.print(f"[green]Wrote {out}[/green]")
+
+
+@app.command()
+def purge(
+    dry_run: Annotated[bool, typer.Option(help="Only count")] = False,
+    run_id: Annotated[int | None, typer.Option(help="Purge one run's personal data now (ignores TTL)")] = None,
+) -> None:
+    """Delete personal data past its TTL (aggregates are kept)."""
+    from dcr.db.session import get_sessionmaker
+    from dcr.pipeline.retention import purge_expired
+
+    counts = purge_expired(get_sessionmaker(), get_config(), run_id=run_id, force=run_id is not None, dry_run=dry_run)
+    t = Table("table", "would delete" if dry_run else "deleted")
+    for k, v in counts.items():
+        t.add_row(k, str(v))
+    console.print(t)
+
+
 data_app = typer.Typer(help="Reference data management.")
 app.add_typer(data_app, name="data")
 
