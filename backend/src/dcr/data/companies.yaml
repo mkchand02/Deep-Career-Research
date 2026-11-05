@@ -1,0 +1,150 @@
+# Canonical companies. type: big_tech | enterprise | startup | finance | consulting | academia | government | other
+# aliases are matched case-insensitively after punctuation/legal-suffix stripping.
+companies:
+  Google:
+    aliases: [Google LLC, Google Inc, Alphabet, Alphabet Inc, Google Cloud, GCP, YouTube, Google DeepMind, DeepMind, Waymo, Verily, Fitbit]
+    type: big_tech
+  Amazon:
+    aliases: [Amazon.com, Amazon Web Services, AWS, Amazon Inc, Twitch, Zoox, Audible]
+    type: big_tech
+  Microsoft:
+    aliases: [Microsoft Corporation, MSFT, LinkedIn, GitHub, Azure, Nuance]
+    type: big_tech
+  Meta:
+    aliases: [Facebook, Meta Platforms, Instagram, WhatsApp, Oculus]
+    type: big_tech
+  Apple:
+    aliases: [Apple Inc]
+    type: big_tech
+  Netflix:
+    aliases: [Netflix Inc]
+    type: big_tech
+  Nvidia:
+    aliases: [NVIDIA Corporation]
+    type: big_tech
+  Salesforce:
+    aliases: [Salesforce.com, Slack, Tableau, MuleSoft]
+    type: enterprise
+  Oracle:
+    aliases: [Oracle Corporation, Oracle Cloud]
+    type: enterprise
+  IBM:
+    aliases: [International Business Machines, IBM Research, Red Hat]
+    type: enterprise
+  Adobe:
+    aliases: [Adobe Inc, Adobe Systems]
+    type: enterprise
+  Intel:
+    aliases: [Intel Corporation]
+    type: enterprise
+  Cisco:
+    aliases: [Cisco Systems]
+    type: enterprise
+  SAP:
+    aliases: [SAP SE, SAP Labs]
+    type: enterprise
+  VMware:
+    aliases: [VMware by Broadcom, Broadcom]
+    type: enterprise
+  Uber:
+    aliases: [Uber Technologies]
+    type: big_tech
+  Airbnb:
+    aliases: [Airbnb Inc]
+    type: big_tech
+  Stripe:
+    aliases: [Stripe Inc]
+    type: startup
+  Databricks:
+    aliases: [Databricks Inc]
+    type: startup
+  Snowflake:
+    aliases: [Snowflake Inc, Snowflake Computing]
+    type: enterprise
+  OpenAI:
+    aliases: [OpenAI LP]
+    type: startup
+  Anthropic:
+    aliases: [Anthropic PBC]
+    type: startup
+  Palantir:
+    aliases: [Palantir Technologies]
+    type: enterprise
+  Scale AI:
+    aliases: [Scale]
+    type: startup
+  Figma:
+    aliases: [Figma Inc]
+    type: startup
+  Notion:
+    aliases: [Notion Labs]
+    type: startup
+  Rippling:
+    aliases: []
+    type: startup
+  Plaid:
+    aliases: []
+    type: startup
+  Coinbase:
+    aliases: [Coinbase Global]
+    type: enterprise
+  Robinhood:
+    aliases: [Robinhood Markets]
+    type: enterprise
+  Goldman Sachs:
+    aliases: [Goldman Sachs Group, GS]
+    type: finance
+  JPMorgan Chase:
+    aliases: [JPMorgan, JP Morgan, JPMC, J.P. Morgan, Chase]
+    type: finance
+  Morgan Stanley:
+    aliases: []
+    type: finance
+  Capital One:
+    aliases: [Capital One Financial]
+    type: finance
+  Bloomberg:
+    aliases: [Bloomberg LP]
+    type: finance
+  Two Sigma:
+    aliases: []
+    type: finance
+  Citadel:
+    aliases: [Citadel Securities, Citadel LLC]
+    type: finance
+  Accenture:
+    aliases: [Accenture Federal Services]
+    type: consulting
+  Deloitte:
+    aliases: [Deloitte Consulting, Deloitte Digital]
+    type: consulting
+  McKinsey & Company:
+    aliases: [McKinsey, QuantumBlack]
+    type: consulting
+  Infosys:
+    aliases: [Infosys Limited]
+    type: consulting
+  Tata Consultancy Services:
+    aliases: [TCS]
+    type: consulting
+  Wipro:
+    aliases: [Wipro Limited]
+    type: consulting
+  Cognizant:
+    aliases: [Cognizant Technology Solutions]
+    type: consulting
+  Flipkart:
+    aliases: []
+    type: big_tech
+  Alibaba:
+    aliases: [Alibaba Group, Alibaba Cloud]
+    type: big_tech
+  Tencent:
+    aliases: []
+    type: big_tech
+  ByteDance:
+    aliases: [TikTok]
+    type: big_tech
+  Samsung:
+    aliases: [Samsung Electronics, Samsung Research]
+    type: enterprise

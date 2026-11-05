@@ -1,0 +1,87 @@
+[project]
+name = "deep-career-research"
+version = "0.1.0"
+description = "Local-first, aggregate-only hiring-trend research from public professional profiles."
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "MILAN CHANDIRAMANI" }]
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "pydantic>=2.8",
+  "pydantic-settings>=2.4",
+  "sqlalchemy>=2.0.30",
+  "alembic>=1.13",
+  "typer>=0.12",
+  "rich>=13.7",
+  "structlog>=24.1",
+  "pyyaml>=6.0",
+  "faker>=26.0",
+  "httpx>=0.27",
+  "tenacity>=8.5",
+  "rapidfuzz>=3.9",
+  "numpy>=1.26",
+  "scikit-learn>=1.5",
+  "protego>=0.3",
+  "beautifulsoup4>=4.12",
+  "lxml>=5.2",
+  "anthropic>=0.40",
+  "jinja2>=3.1",
+  "matplotlib>=3.9",
+  "python-dateutil>=2.9",
+]
+
+[project.optional-dependencies]
+pdf = ["weasyprint>=62"]
+postgres = ["psycopg[binary]>=3.2"]
+
+[project.scripts]
+dcr = "dcr.cli:app"
+
+
+[dependency-groups]
+dev = [
+  "pytest>=8.3",
+  "pytest-asyncio>=0.23",
+  "pytest-cov>=5.0",
+  "respx>=0.21",
+  "ruff>=0.6",
+  "mypy>=1.11",
+  "types-pyyaml",
+  "types-python-dateutil",
+  "weasyprint>=62",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/dcr"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+ignore = ["RUF001", "RUF002", "RUF003", "B008", "RUF012", "UP047", "SIM108"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/dcr/synth/generator.py" = ["E501"]
+"src/dcr/exports/report.py" = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+packages = ["dcr"]
+mypy_path = "src"
+ignore_missing_imports = true
+warn_unused_ignores = true
+check_untyped_defs = true

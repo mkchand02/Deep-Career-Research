@@ -1,0 +1,47 @@
+# One-command startup:  docker compose up --build
+# Web UI: http://localhost:3000   API: http://localhost:8000/docs
+# Ports bind to 127.0.0.1 only: this app is local-first and has no authentication.
+services:
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-sqlite:////data/dcr.db}
+    volumes:
+      - dcr-data:/data
+      - ./data:/app/data:ro          # put CSV/JSON imports here (manual:/app/data/<file>)
+    ports:
+      - "127.0.0.1:8000:8000"
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./web
+      args:
+        API_URL: http://api:8000
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3000:3000"
+    restart: unless-stopped
+
+  # Optional Postgres: docker compose --profile postgres up --build
+  # and set DATABASE_URL=postgresql+psycopg://dcr:dcr@db:5432/dcr in .env (backend needs the 'postgres' extra).
+  db:
+    image: postgres:16.4-alpine
+    profiles: ["postgres"]
+    environment:
+      POSTGRES_USER: dcr
+      POSTGRES_PASSWORD: dcr
+      POSTGRES_DB: dcr
+    volumes:
+      - dcr-pg:/var/lib/postgresql/data
+
+volumes:
+  dcr-data:
+  dcr-pg:

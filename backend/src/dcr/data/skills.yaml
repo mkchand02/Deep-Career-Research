@@ -1,0 +1,89 @@
+# canonical skill -> {category, aliases}
+skills:
+  Python: {category: language, aliases: [python3, py, python 3]}
+  Java: {category: language, aliases: [java8, java 11, java17, core java]}
+  Go: {category: language, aliases: [golang]}
+  C++: {category: language, aliases: [cpp, c plus plus, cplusplus]}
+  C: {category: language, aliases: [c language, ansi c]}
+  C#: {category: language, aliases: [csharp, c sharp]}
+  Rust: {category: language, aliases: [rustlang]}
+  JavaScript: {category: language, aliases: [js, javascript es6, es6, ecmascript]}
+  TypeScript: {category: language, aliases: [ts]}
+  Kotlin: {category: language, aliases: []}
+  Swift: {category: language, aliases: []}
+  Scala: {category: language, aliases: []}
+  Ruby: {category: language, aliases: []}
+  SQL: {category: language, aliases: [sql queries, t-sql, pl/sql, ansi sql]}
+  Bash: {category: language, aliases: [shell, shell scripting, bash scripting]}
+  R: {category: language, aliases: [r language, rlang]}
+  Kubernetes: {category: infra, aliases: [k8s, kube, gke, eks, aks]}
+  Docker: {category: infra, aliases: [containers, docker compose, containerization]}
+  Terraform: {category: infra, aliases: [hcl, terraform cloud]}
+  Ansible: {category: infra, aliases: []}
+  Helm: {category: infra, aliases: [helm charts]}
+  Linux: {category: infra, aliases: [unix, ubuntu, rhel]}
+  CI/CD: {category: infra, aliases: [cicd, ci cd, continuous integration, github actions, jenkins, gitlab ci]}
+  Prometheus: {category: infra, aliases: [grafana]}
+  Istio: {category: infra, aliases: [service mesh]}
+  Google Cloud: {category: cloud, aliases: [gcp, google cloud platform, bigquery, cloud run]}
+  AWS: {category: cloud, aliases: [amazon web services, ec2, s3, lambda, aws lambda]}
+  Azure: {category: cloud, aliases: [microsoft azure]}
+  Distributed Systems: {category: concept, aliases: [distributed computing, large scale systems]}
+  Microservices: {category: concept, aliases: [micro services, microservice architecture]}
+  System Design: {category: concept, aliases: [systems design]}
+  Data Structures & Algorithms: {category: concept, aliases: [dsa, algorithms, data structures]}
+  REST APIs: {category: concept, aliases: [rest, restful apis, rest api]}
+  gRPC: {category: concept, aliases: [protobuf, protocol buffers]}
+  GraphQL: {category: concept, aliases: []}
+  Machine Learning: {category: ml, aliases: [ml, machine-learning, statistical learning]}
+  Deep Learning: {category: ml, aliases: [dl, neural networks]}
+  PyTorch: {category: ml, aliases: [torch]}
+  TensorFlow: {category: ml, aliases: [tf, keras, tensorflow 2]}
+  JAX: {category: ml, aliases: [flax]}
+  scikit-learn: {category: ml, aliases: [sklearn, scikit learn]}
+  LLMs: {category: ml, aliases: [large language models, llm, generative ai, genai, gen ai]}
+  RAG: {category: ml, aliases: [retrieval augmented generation, retrieval-augmented generation]}
+  Prompt Engineering: {category: ml, aliases: [prompting]}
+  NLP: {category: ml, aliases: [natural language processing]}
+  Computer Vision: {category: ml, aliases: [cv, image recognition, opencv]}
+  MLOps: {category: ml, aliases: [ml ops, model deployment, kubeflow, mlflow]}
+  Hugging Face: {category: ml, aliases: [huggingface, transformers]}
+  LangChain: {category: ml, aliases: [langgraph]}
+  Vector Databases: {category: ml, aliases: [pinecone, weaviate, pgvector, faiss]}
+  Reinforcement Learning: {category: ml, aliases: [rl, rlhf]}
+  Apache Spark: {category: data, aliases: [spark, pyspark, spark sql]}
+  Apache Kafka: {category: data, aliases: [kafka, confluent]}
+  Apache Airflow: {category: data, aliases: [airflow]}
+  Apache Beam: {category: data, aliases: [beam, dataflow, google dataflow]}
+  dbt: {category: data, aliases: [data build tool]}
+  Hadoop: {category: data, aliases: [hdfs, hive, mapreduce]}
+  Data Warehousing: {category: data, aliases: [data warehouse, snowflake, redshift]}
+  ETL: {category: data, aliases: [elt, data pipelines, etl pipelines]}
+  Pandas: {category: data, aliases: [numpy]}
+  Data Visualization: {category: data, aliases: [tableau, looker, power bi]}
+  PostgreSQL: {category: database, aliases: [postgres, psql]}
+  MySQL: {category: database, aliases: [mariadb]}
+  MongoDB: {category: database, aliases: [mongo]}
+  Redis: {category: database, aliases: []}
+  Cassandra: {category: database, aliases: [apache cassandra]}
+  Elasticsearch: {category: database, aliases: [elastic, opensearch]}
+  Spanner: {category: database, aliases: [cloud spanner]}
+  React: {category: web, aliases: [react.js, reactjs]}
+  Next.js: {category: web, aliases: [nextjs]}
+  Node.js: {category: web, aliases: [node, nodejs, express, express.js]}
+  Angular: {category: web, aliases: [angularjs]}
+  Vue.js: {category: web, aliases: [vue, vuejs]}
+  HTML/CSS: {category: web, aliases: [html, css, html5, css3, tailwind]}
+  Django: {category: web, aliases: []}
+  Flask: {category: web, aliases: []}
+  FastAPI: {category: web, aliases: []}
+  Spring Boot: {category: web, aliases: [spring, spring framework]}
+  Android: {category: mobile, aliases: [android sdk, jetpack compose]}
+  iOS: {category: mobile, aliases: [swiftui, uikit]}
+  Git: {category: tools, aliases: [github, gitlab, version control]}
+  Security: {category: security, aliases: [cybersecurity, appsec, application security, infosec]}
+  Networking: {category: infra, aliases: [tcp/ip, computer networking, vpc]}
+  Observability: {category: infra, aliases: [monitoring, logging, opentelemetry, datadog]}
+  Customer-facing Engineering: {category: soft, aliases: [solutions engineering, customer engineering, technical consulting, client facing]}
+  Technical Communication: {category: soft, aliases: [communication, technical writing]}
+  Agile: {category: soft, aliases: [scrum, kanban]}

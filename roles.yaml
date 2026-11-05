@@ -1,0 +1,10 @@
+# Example role list for `dcr run --roles roles.yaml`
+include_similar: true
+roles:
+  - SDE I
+  - SDE II
+  - SDE III
+  - Cloud Engineer
+  - AI Engineer
+  - Forward Deployed Engineer
+  - Data Engineer
