@@ -2,11 +2,26 @@
 
 from __future__ import annotations
 
+import contextlib
 import logging
 import os
 import sys
 
 import structlog
+
+
+class _StderrLogger:
+    """Writes to whatever ``sys.stderr`` is *now* (robust to redirected/closed streams in tests and CLIs)."""
+
+    def msg(self, message: str) -> None:
+        with contextlib.suppress(ValueError):  # stream closed
+            print(message, file=sys.stderr, flush=True)
+
+    log = debug = info = warning = warn = error = critical = exception = fatal = msg
+
+
+def _factory(*_: object) -> _StderrLogger:
+    return _StderrLogger()
 
 
 def configure_logging(level: str | None = None, json_logs: bool | None = None) -> None:
@@ -25,6 +40,6 @@ def configure_logging(level: str | None = None, json_logs: bool | None = None) -
     structlog.configure(
         processors=[*processors, renderer],
         wrapper_class=structlog.make_filtering_bound_logger(lvl),
-        logger_factory=structlog.PrintLoggerFactory(file=sys.stderr),
+        logger_factory=_factory,
         cache_logger_on_first_use=False,
     )

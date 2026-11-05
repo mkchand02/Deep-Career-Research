@@ -39,7 +39,7 @@ def _as_list(v: Any) -> list[str]:
     if v is None:
         return []
     if isinstance(v, str):
-        return [x.strip() for x in re.split(r"[\n,]", v) if x.strip()]
+        return [x.strip() for x in re.split(r"[\n,|]", v) if x.strip()]
     return [str(x) for x in v]
 
 

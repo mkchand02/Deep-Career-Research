@@ -64,3 +64,33 @@ def test_api_end_to_end(app_config, secrets, session_factory, ref_date) -> None:
         # no per-person data anywhere in the run payloads
         body = c.get(f"/api/runs/{run_id}").text + c.get(f"/api/runs/{run_id}/report").text
         assert "full_name" not in body and "github_username" not in body
+
+
+def test_api_exports_compare_purge(app_config, secrets, session_factory, ref_date) -> None:  # type: ignore[no-untyped-def]
+    import time
+
+    app = create_app(app_config, secrets, session_factory)
+    with TestClient(app) as c:
+        ids = [c.post("/api/runs", json={"query": _query(ref_date)}).json()["run_id"] for _ in range(2)]
+        for _ in range(300):
+            if all(c.get(f"/api/runs/{i}").json()["status"] in ("completed", "failed") for i in ids):
+                break
+            time.sleep(0.1)
+        for fmt, ctype in (
+            ("csv", "text/csv"),
+            ("json", "application/json"),
+            ("html", "text/html"),
+            ("zip", "application/zip"),
+            ("pdf", "application/pdf"),
+        ):
+            r = c.get(f"/api/runs/{ids[0]}/export.{fmt}")
+            assert r.status_code == 200 and r.headers["content-type"].startswith(ctype), (fmt, r.text[:200])
+        assert c.get(f"/api/runs/{ids[0]}/export.xls").status_code == 400
+        cmp = c.get("/api/compare", params={"runs": f"{ids[0]},{ids[1]}"}).json()
+        assert len(cmp["runs"]) == 2 and cmp["metrics"]
+        assert c.get("/api/compare", params={"runs": str(ids[0])}).status_code == 400
+        assert c.post("/api/purge", params={"dry_run": True}).json()["dry_run"] is True
+        assert c.get("/api/methodology").json()["k_anonymity"] == 5
+        est = c.post("/api/estimate", json={"query": _query(ref_date)}).json()
+        assert est["estimated_usd"] == 0.0  # no API key in tests
+        assert c.get("/api/runs/999").status_code == 404

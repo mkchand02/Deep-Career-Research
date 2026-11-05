@@ -312,3 +312,24 @@ async def test_pdl_brave_x_with_mock_keys(app_config, secrets, ref_date) -> None
     assert xp.positions[0].title == "Data Engineer" and xp.positions[0].start_date == date(2026, 10, 20)
     assert len([p for p in res.profiles if p.source == "x"]) == 1  # Stripe post filtered out
     json.dumps([p.model_dump(mode="json") for p in res.profiles])
+
+
+async def test_manual_jobs_csv_and_json(app_config, secrets, ref_date, tmp_path) -> None:  # type: ignore[no-untyped-def]
+    (tmp_path / "p.csv").write_text(
+        "title,location,skills,posted_at,description\n"
+        "Data Engineer,Seattle WA,,2026-10-01,Spark and Airflow pipelines\n"
+        "SWE II,NYC,Go|k8s,,\n"
+    )
+    (tmp_path / "p.json").write_text(json.dumps({"postings": [{"title": "ML Engineer", "skills": ["PyTorch"]}]}))
+    for f in ("p.csv", "p.json"):
+        query = q(ref_date).model_copy(
+            update={"sources": [SourceSpec(name="manual_jobs", params={"path": str(tmp_path / f)})]}
+        )
+        res = await discover(query, app_config, secrets)
+        assert res.postings and not res.errors
+    res = await discover(
+        q(ref_date).model_copy(update={"sources": [SourceSpec(name="manual_jobs", params={"path": "nope.csv"})]}),
+        app_config,
+        secrets,
+    )
+    assert res.errors

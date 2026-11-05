@@ -11,6 +11,26 @@ from dcr.models import SourceSpec, StudyQuery
 from dcr.pipeline.runner import StudyRunner
 from dcr.synth.generator import SyntheticGenerator
 
+STATIC_TEXT_KEYS = {
+    "note",
+    "label",
+    "limitations",
+    "disclaimer",
+    "no_sensitive_inference",
+    "suppression_reason",
+    "gender_estimator",
+}
+
+
+def _strip_static(obj):  # type: ignore[no-untyped-def]
+    """Drop our own fixed explanatory text (e.g. 'Chapman estimator') so name checks only see data values."""
+    if isinstance(obj, dict):
+        return {k: _strip_static(v) for k, v in obj.items() if k not in STATIC_TEXT_KEYS}
+    if isinstance(obj, list):
+        return [_strip_static(v) for v in obj]
+    return obj
+
+
 ROLES = ["SDE I", "SDE II", "SDE III", "Cloud Engineer", "AI Engineer", "Forward Deployed Engineer", "Data Engineer"]
 
 
@@ -41,11 +61,11 @@ async def test_all_views_k_anonymous_and_pii_free(app_config, secrets, session_f
     for row in rows:
         payload = row.payload
         assert check_report_cells(payload.get("sections", {}), 5) == [], row.filter_key
-        blob = json.dumps(payload)
+        blob = json.dumps(_strip_static(payload))
         assert "github.com/" not in blob and "https://" not in blob
-        for h in list(handles)[:300]:
+        for h in sorted(handles):
             assert h not in blob, (row.filter_key, h)
-        for nm in list(surnames)[:300]:
+        for nm in sorted(surnames):
             assert f'"{nm}"' not in blob and f"{nm} " not in blob, (row.filter_key, nm)
     # filtered views
     rep = get_report(session_factory, out.run_id, {"role": "software_engineer"}, app_config)
