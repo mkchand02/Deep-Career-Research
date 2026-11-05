@@ -210,5 +210,6 @@ class AnalysisRecord(BaseModel):
     hire_type: Literal["new_grad", "lateral", "unknown"]
     interned_at_target: bool
     worked_abroad: bool | None
-    gender_self: Literal["woman", "man", "nonbinary"] | None = None
-    p_female_name: float | None = None
+    pronoun_group: Literal["she", "he", "they"] | None = None  # self-stated pronouns only
+    p_female_name: float | None = None  # optional name-based estimate (aggregate use only)
+    name_estimable: bool = False

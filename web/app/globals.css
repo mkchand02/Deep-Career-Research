@@ -1,0 +1,88 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --page: #f9f9f7;
+  --surface-1: #fcfcfb;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #898781;
+  --gridline: #e1e0d9;
+  --baseline: #c3c2b7;
+  --border: rgba(11, 11, 11, 0.1);
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-1-soft: #cde2fb;
+  --good: #006300;
+  --warning: #9a6700;
+  --critical: #d03b3b;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0d0d0d;
+    --surface-1: #1a1a19;
+    --text-primary: #f0efec;
+    --text-secondary: #c3c2b7;
+    --text-muted: #898781;
+    --gridline: #2c2c2a;
+    --baseline: #383835;
+    --border: rgba(255, 255, 255, 0.1);
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --series-1-soft: #184f95;
+    --good: #0ca30c;
+    --warning: #fab219;
+    --critical: #e66767;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d;
+  --surface-1: #1a1a19;
+  --text-primary: #f0efec;
+  --text-secondary: #c3c2b7;
+  --text-muted: #898781;
+  --gridline: #2c2c2a;
+  --baseline: #383835;
+  --border: rgba(255, 255, 255, 0.1);
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-1-soft: #184f95;
+  --good: #0ca30c;
+  --warning: #fab219;
+  --critical: #e66767;
+}
+
+body {
+  background: var(--page);
+  color: var(--text-primary);
+}
+@layer components {
+.card {
+  @apply rounded-xl border border-border bg-surface p-4;
+}
+.btn {
+  @apply inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium transition;
+}
+.btn-primary {
+  @apply btn bg-accent text-white hover:opacity-90 disabled:opacity-50;
+}
+.btn-ghost {
+  @apply btn border border-border text-ink hover:bg-line;
+}
+.input {
+  @apply w-full rounded-lg border border-border bg-surface px-3 py-1.5 text-sm text-ink outline-none focus:border-accent;
+}
+.label {
+  @apply mb-1 block text-xs font-medium uppercase tracking-wide text-ink2;
+}
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+}

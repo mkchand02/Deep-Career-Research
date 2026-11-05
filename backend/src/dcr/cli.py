@@ -198,6 +198,18 @@ def run(
     asyncio.run(run_study_cli(q, console=console, assume_yes=yes, save_as=save_as, out=out))
 
 
+@app.command()
+def serve(
+    host: Annotated[str, typer.Option(help="Bind host")] = "127.0.0.1",
+    port: Annotated[int, typer.Option(help="Port")] = 8000,
+    reload: Annotated[bool, typer.Option(help="Auto-reload (dev)")] = False,
+) -> None:
+    """Start the API server (with the local background worker)."""
+    import uvicorn
+
+    uvicorn.run("dcr.api.app:create_app", factory=True, host=host, port=port, reload=reload)
+
+
 def main() -> None:  # pragma: no cover
     app()
 
