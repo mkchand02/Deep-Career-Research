@@ -24,6 +24,9 @@ class DiscoveryResult:
     errors: list[dict[str, Any]] = field(default_factory=list)
     requests: dict[str, int] = field(default_factory=dict)
     skipped_sources: list[dict[str, str]] = field(default_factory=list)
+    robots_skips: list[dict[str, str]] = field(default_factory=list)
+    llm_cost_usd: float = 0.0
+    linked_enrichments: int = 0
 
 
 def _safe_error(source: str, stage: str, exc: BaseException) -> dict[str, Any]:
@@ -94,8 +97,31 @@ async def discover(
     tasks = [run_profiles(a) if isinstance(a, SourceAdapter) else run_jobs(a) for a in adapters]
     try:
         await asyncio.gather(*tasks)
+        # Enrichment pass: adapters with ``enrich`` (e.g. GitHub) add data to profiles from other sources.
+        for a in adapters:
+            enrich = getattr(a, "enrich", None)
+            if enrich is None or not a.params.get("enrich_linked", True):
+                continue
+            targets = [p for p in result.profiles if p.source != a.name and p.github_username][
+                : int(a.params.get("max_enrich", 200))
+            ]
+
+            async def enrich_one(p: RawProfile, fn: Any = enrich, name: str = a.name) -> None:
+                async with sem:
+                    try:
+                        extra = await fn(p)
+                    except Exception as exc:
+                        result.errors.append(_safe_error(name, "enrich", exc))
+                        return
+                    if extra is not None:
+                        result.profiles.append(extra)
+                        result.linked_enrichments += 1
+
+            await asyncio.gather(*(enrich_one(p) for p in targets))
     finally:
         for a in adapters:
             result.requests[a.name] = a.ctx.requests_made
+            result.llm_cost_usd += float(getattr(a, "llm_cost_usd", 0.0))
+            result.robots_skips += [dict(x, source=a.name) for x in getattr(a, "skipped", [])][:200]
             await a.aclose()
     return result

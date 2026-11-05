@@ -20,7 +20,6 @@ _AMBIGUOUS_IN_TEXT = {
     "shell",
     "elastic",
     "scale",
-    "spark",
     "express",
     "containers",
     "transformers",

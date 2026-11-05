@@ -172,6 +172,7 @@ class StudyRunner:
             counts.source_errors = len(disc.errors)
             counts.job_postings = len(disc.postings)
             cost.api_requests = disc.requests
+            cost.actual_usd += disc.llm_cost_usd
             self._store_discovery(run_id, disc, expires)
             self.audit(
                 run_id,
@@ -182,8 +183,18 @@ class StudyRunner:
                     "errors": counts.source_errors,
                     "skipped": disc.skipped_sources,
                     "postings": counts.job_postings,
+                    "linked_enrichments": disc.linked_enrichments,
                 },
             )
+            if disc.robots_skips:
+                # Host + reason only (never full URLs of personal pages).
+                self.audit(
+                    run_id,
+                    "discover",
+                    "pages_not_fetched",
+                    {"count": len(disc.robots_skips), "examples": disc.robots_skips[:20]},
+                    "warning",
+                )
             self._emit(run_id, "resolve", counts, cost, errors=errors)
 
             # 2. resolve -------------------------------------------------------
