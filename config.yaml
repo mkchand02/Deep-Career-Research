@@ -1,0 +1,77 @@
+# Deep Career Research configuration. Secrets go in .env (see .env.example).
+database_url: sqlite:///./dcr.db
+user_agent: "DeepCareerResearch/0.1 (+https://github.com/mkchand02/deep-career-research)"
+
+privacy:
+  k_anonymity: 5            # minimum bucket size; values below 5 are raised to 5
+  raw_ttl_days: 30          # raw/normalized personal data is purged after this many days
+  gender_name_estimator: false   # optional aggregate-only name-based estimate (off by default)
+  gender_name_min_count: 50      # minimum name frequency in the reference table to use a name
+  audit_mode: false         # expose anonymized IDs + filter reasons (never names/URLs)
+
+pipeline:
+  include_unknown_start_date: false
+  exclude_internships: true
+  min_confidence: 0.6
+  default_sample_cap: 500
+  trend_windows: [30, 60, 90]
+  resolution_threshold: 0.82
+
+enrichment:
+  enabled: true
+  provider: anthropic
+  model: claude-opus-5-5
+  max_output_tokens: 2048
+  budget_usd: 5.0
+  concurrency: 4
+  pricing:                  # USD per million tokens; update when prices change
+    claude-opus-5-5: {input_per_mtok: 5.0, output_per_mtok: 25.0}
+    claude-sonnet-5-5: {input_per_mtok: 3.0, output_per_mtok: 15.0}
+    claude-haiku-5-5: {input_per_mtok: 1.0, output_per_mtok: 5.0}
+
+sources:
+  manual:
+    enabled: true
+    tos_note: "You must have the right to process any data you import."
+  synthetic:
+    enabled: true
+    tos_note: "Generated fake data."
+  github:
+    enabled: true
+    rate_limit_per_minute: 20      # unauthenticated core API allows 60/hour; set GITHUB_TOKEN for 5000/hour
+    cache_ttl_hours: 24
+    tos_note: "GitHub REST API per GitHub Terms of Service and API rate limits. Public data only."
+  web_scraper:
+    enabled: true
+    rate_limit_per_minute: 12      # per process; also delays per domain (see adapter)
+    max_pages_per_domain: 25
+    cache_ttl_hours: 72
+    tos_note: "Fetches only public pages permitted by robots.txt; never logs in; never bypasses bot detection. LinkedIn and other login-walled sites are blocked."
+  greenhouse:
+    enabled: true
+    rate_limit_per_minute: 30
+    tos_note: "Greenhouse public Job Board API (boards-api.greenhouse.io)."
+  lever:
+    enabled: true
+    rate_limit_per_minute: 30
+    tos_note: "Lever public postings API (api.lever.co/v0/postings)."
+  ashby:
+    enabled: true
+    rate_limit_per_minute: 30
+    tos_note: "Ashby public job board API (api.ashbyhq.com/posting-api)."
+  manual_jobs:
+    enabled: true
+  synthetic_jobs:
+    enabled: true
+  pdl:
+    enabled: false
+    rate_limit_per_minute: 10
+    tos_note: "People Data Labs: licensed data; follow your PDL contract and permissible-purpose terms."
+  brave:
+    enabled: false
+    rate_limit_per_minute: 1
+    tos_note: "Brave Search API terms; results used only for discovery of public pages."
+  x:
+    enabled: false
+    rate_limit_per_minute: 1
+    tos_note: "Official X API v2 only, with your own credentials, within its developer terms."

@@ -1,0 +1,149 @@
+# Canonical roles: display name, title patterns (lowercase, level tokens stripped), and similar roles.
+# Matching: exact phrase after normalization, then fuzzy (token_set_ratio >= 88).
+roles:
+  software_engineer:
+    display: Software Engineer
+    titles: [software engineer, software development engineer, sde, swe, software developer, developer,
+             programmer, backend engineer, back end engineer, backend developer, full stack engineer,
+             fullstack engineer, full stack developer, software engineer backend, application engineer,
+             member of technical staff, mts, engineer]
+    similar: [frontend_engineer, mobile_engineer, sre]
+  frontend_engineer:
+    display: Frontend Engineer
+    titles: [frontend engineer, front end engineer, front end developer, frontend developer, ui engineer, web developer, web engineer]
+    similar: [software_engineer]
+  mobile_engineer:
+    display: Mobile Engineer
+    titles: [mobile engineer, ios engineer, android engineer, ios developer, android developer, mobile developer]
+    similar: [software_engineer]
+  cloud_engineer:
+    display: Cloud Engineer
+    titles: [cloud engineer, cloud infrastructure engineer, cloud developer, cloud software engineer,
+             cloud platform engineer, platform engineer, infrastructure engineer, devops engineer, cloud devops engineer]
+    similar: [sre, cloud_solutions_engineer]
+  sre:
+    display: Site Reliability Engineer
+    titles: [site reliability engineer, sre, production engineer, reliability engineer, systems engineer]
+    similar: [cloud_engineer]
+  ai_engineer:
+    display: AI / ML Engineer
+    titles: [ai engineer, machine learning engineer, ml engineer, mle, applied ai engineer, generative ai engineer,
+             genai engineer, llm engineer, deep learning engineer, ai ml engineer, software engineer machine learning,
+             software engineer ml, software engineer ai, applied machine learning engineer, ai software engineer]
+    similar: [research_engineer, applied_scientist, data_scientist]
+  research_engineer:
+    display: Research Engineer
+    titles: [research engineer, research software engineer, ai research engineer, ml research engineer]
+    similar: [ai_engineer]
+  applied_scientist:
+    display: Applied / Research Scientist
+    titles: [applied scientist, research scientist, machine learning scientist, ai scientist]
+    similar: [ai_engineer, data_scientist]
+  forward_deployed_engineer:
+    display: Forward Deployed Engineer
+    titles: [forward deployed engineer, forward deployed software engineer, fde, deployed engineer,
+             deployment strategist, solutions engineer deployed, field engineer, embedded engineer customer]
+    similar: [cloud_solutions_engineer, solutions_engineer]
+  solutions_engineer:
+    display: Solutions Engineer
+    titles: [solutions engineer, sales engineer, solutions architect, technical solutions engineer, customer engineer,
+             technical account manager, implementation engineer, integration engineer]
+    similar: [forward_deployed_engineer, cloud_solutions_engineer]
+  cloud_solutions_engineer:
+    display: Cloud Solutions / Customer Engineer
+    titles: [cloud solutions engineer, cloud customer engineer, cloud solutions architect, cloud technical solutions engineer,
+             cloud consultant, cloud technical resident]
+    similar: [solutions_engineer, cloud_engineer]
+  data_engineer:
+    display: Data Engineer
+    titles: [data engineer, big data engineer, data platform engineer, analytics engineer, etl engineer, data infrastructure engineer,
+             software engineer data]
+    similar: [data_scientist, ml_platform]
+  ml_platform:
+    display: ML Platform / MLOps Engineer
+    titles: [mlops engineer, ml platform engineer, ml infrastructure engineer, machine learning platform engineer]
+    similar: [ai_engineer, data_engineer]
+  data_scientist:
+    display: Data Scientist
+    titles: [data scientist, data analyst, quantitative analyst, product data scientist, decision scientist]
+    similar: [data_engineer, applied_scientist]
+  security_engineer:
+    display: Security Engineer
+    titles: [security engineer, application security engineer, product security engineer, security software engineer, cybersecurity engineer]
+    similar: [sre]
+  product_manager:
+    display: Product Manager
+    titles: [product manager, technical program manager, program manager, associate product manager, apm, tpm]
+    similar: []
+  hardware_engineer:
+    display: Hardware Engineer
+    titles: [hardware engineer, asic engineer, silicon engineer, chip design engineer, design verification engineer]
+    similar: []
+
+# Free-text role requests that imply a canonical role (+ optional level), e.g. "SDE II".
+# Level tokens are parsed separately, so "SDE" -> software_engineer is enough here.
+aliases:
+  sde: software_engineer
+  swe: software_engineer
+  ai engineer: ai_engineer
+  ml engineer: ai_engineer
+  fde: forward_deployed_engineer
+
+# Company-specific level ladders: token -> band. Generic ladder applies when no company ladder matches.
+ladders:
+  generic:
+    "i": entry
+    "1": entry
+    "ii": mid
+    "2": mid
+    "iii": senior
+    "3": senior
+    "iv": staff
+    "4": staff
+    junior: entry
+    jr: entry
+    associate: entry
+    new grad: entry
+    entry level: entry
+    graduate: entry
+    senior: senior
+    sr: senior
+    lead: staff
+    staff: staff
+    principal: principal
+    distinguished: principal
+    fellow: principal
+  Google:
+    "l3": entry
+    "l4": mid
+    "l5": senior
+    "l6": staff
+    "l7": principal
+    "l8": principal
+    "ii": entry      # Google "Software Engineer II" is L3
+    "iii": mid       # "Software Engineer III" is L4
+    senior: senior
+    staff: staff
+  Amazon:
+    "l4": entry
+    "l5": mid
+    "l6": senior
+    "l7": staff
+    "i": entry
+    "ii": mid
+    "iii": senior
+  Microsoft:
+    "59": entry
+    "60": entry
+    "61": mid
+    "62": mid
+    "63": senior
+    "64": senior
+    "65": staff
+    "ii": mid
+  Meta:
+    "e3": entry
+    "e4": mid
+    "e5": senior
+    "e6": staff
+    "e7": principal
