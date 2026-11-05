@@ -198,6 +198,42 @@ def run(
     asyncio.run(run_study_cli(q, console=console, assume_yes=yes, save_as=save_as, out=out))
 
 
+data_app = typer.Typer(help="Reference data management.")
+app.add_typer(data_app, name="data")
+
+
+@data_app.command("fetch-names")
+def fetch_names(
+    from_file: Annotated[
+        Path | None, typer.Option(help="Local SSA names.zip (if automated download is blocked)")
+    ] = None,
+    url: Annotated[str, typer.Option(help="Download URL")] = "https://www.ssa.gov/oact/babynames/names.zip",
+    min_year: Annotated[int, typer.Option(help="Ignore birth years before this")] = 1960,
+) -> None:
+    """Build the name-frequency table used by the OPTIONAL aggregate gender estimator."""
+    import httpx
+
+    from dcr.analytics.demographics import NAME_TABLE_FILE, build_ssa_table
+    from dcr.config import PACKAGE_DATA_DIR
+
+    if from_file:
+        blob = from_file.read_bytes()
+    else:
+        try:
+            r = httpx.get(url, timeout=60, follow_redirects=True, headers={"User-Agent": get_config().user_agent})
+            r.raise_for_status()
+            blob = r.content
+        except httpx.HTTPError as exc:
+            console.print(
+                f"[red]Download failed ({exc}).[/red] Download names.zip manually from "
+                "https://www.ssa.gov/oact/babynames/limits.html and run: "
+                "dcr data fetch-names --from-file names.zip"
+            )
+            raise typer.Exit(1) from exc
+    n = build_ssa_table(blob, PACKAGE_DATA_DIR / NAME_TABLE_FILE, min_year=min_year)
+    console.print(f"[green]Wrote {n} names to {PACKAGE_DATA_DIR / NAME_TABLE_FILE}[/green]")
+
+
 @app.command()
 def serve(
     host: Annotated[str, typer.Option(help="Bind host")] = "127.0.0.1",

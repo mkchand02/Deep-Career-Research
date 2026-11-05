@@ -94,7 +94,8 @@ class EnrichmentConfig(BaseModel):
     enabled: bool = True
     provider: str = "anthropic"
     model: str = "claude-opus-5-5"
-    max_output_tokens: int = 2048
+    effort: str = "low"
+    max_output_tokens: int = 8000
     budget_usd: float = 5.0
     concurrency: int = 4
     pricing: dict[str, ModelPricing] = Field(default_factory=dict)
